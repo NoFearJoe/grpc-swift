@@ -27,19 +27,20 @@ struct HelloWorld: AsyncParsableCommand {
 
   func run() async throws {
     let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-    defer {
-      try! group.syncShutdownGracefully()
-    }
 
     // Start the server and print its address once it has started.
-    let server = try await Server.insecure(group: group)
-      .withServiceProviders([GreeterProvider()])
-      .bind(host: "localhost", port: self.port)
-      .get()
+    do {
+      let server = try await Server.insecure(group: group)
+        .withServiceProviders([GreeterProvider()])
+        .bind(host: "localhost", port: self.port)
+        .get()
 
-    print("server started on port \(server.channel.localAddress!.port!)")
+      print("server started on port \(server.channel.localAddress!.port!)")
 
-    // Wait on the server's `onClose` future to stop the program from exiting.
-    try await server.onClose.get()
+      // Wait on the server's `onClose` future to stop the program from exiting.
+      try await server.onClose.get()
+    } catch {}
+
+    try! await group.shutdownGracefully()
   }
 }

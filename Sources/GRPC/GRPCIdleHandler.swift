@@ -19,7 +19,7 @@ import NIOHTTP2
 import NIOTLS
 import NIOTransportServices
 
-internal final class GRPCIdleHandler: ChannelInboundHandler {
+internal final class GRPCIdleHandler: @unchecked Sendable, ChannelInboundHandler {
   typealias InboundIn = HTTP2Frame
   typealias OutboundOut = HTTP2Frame
 

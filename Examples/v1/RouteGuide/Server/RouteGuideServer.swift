@@ -42,25 +42,26 @@ struct RouteGuide: AsyncParsableCommand {
   func run() async throws {
     // Create an event loop group for the server to run on.
     let group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
-    defer {
-      try! group.syncShutdownGracefully()
-    }
 
-    // Read the feature database.
-    let features = try loadFeatures()
+    do {
+      // Read the feature database.
+      let features = try loadFeatures()
 
-    // Create a provider using the features we read.
-    let provider = RouteGuideProvider(features: features)
+      // Create a provider using the features we read.
+      let provider = RouteGuideProvider(features: features)
 
-    // Start the server and print its address once it has started.
-    let server = try await Server.insecure(group: group)
-      .withServiceProviders([provider])
-      .bind(host: "localhost", port: self.port)
-      .get()
+      // Start the server and print its address once it has started.
+      let server = try await Server.insecure(group: group)
+        .withServiceProviders([provider])
+        .bind(host: "localhost", port: self.port)
+        .get()
 
-    print("server started on port \(server.channel.localAddress!.port!)")
+      print("server started on port \(server.channel.localAddress!.port!)")
 
-    // Wait on the server's `onClose` future to stop the program from exiting.
-    try await server.onClose.get()
+      // Wait on the server's `onClose` future to stop the program from exiting.
+      try await server.onClose.get()
+    } catch {}
+
+    try! await group.shutdownGracefully()
   }
 }

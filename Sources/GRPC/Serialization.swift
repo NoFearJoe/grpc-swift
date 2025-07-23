@@ -20,7 +20,7 @@ import SwiftProtobuf
 
 import struct Foundation.Data
 
-public protocol MessageSerializer {
+public protocol MessageSerializer: Sendable {
   associatedtype Input
 
   /// Serializes `input` into a `ByteBuffer` allocated using the provided `allocator`.
@@ -32,7 +32,7 @@ public protocol MessageSerializer {
   func serialize(_ input: Input, allocator: ByteBufferAllocator) throws -> ByteBuffer
 }
 
-public protocol MessageDeserializer {
+public protocol MessageDeserializer: Sendable {
   associatedtype Output
 
   /// Deserializes `byteBuffer` to produce a single `Output`.
@@ -132,7 +132,7 @@ public struct GRPCPayloadDeserializer<Message: GRPCPayload>: MessageDeserializer
 // MARK: - Any Serializer/Deserializer
 
 internal struct AnySerializer<Input>: MessageSerializer {
-  private let _serialize: (Input, ByteBufferAllocator) throws -> ByteBuffer
+  private let _serialize: @Sendable (Input, ByteBufferAllocator) throws -> ByteBuffer
 
   init<Serializer: MessageSerializer>(wrapping other: Serializer) where Serializer.Input == Input {
     self._serialize = other.serialize(_:allocator:)
@@ -144,7 +144,7 @@ internal struct AnySerializer<Input>: MessageSerializer {
 }
 
 internal struct AnyDeserializer<Output>: MessageDeserializer {
-  private let _deserialize: (ByteBuffer) throws -> Output
+  private let _deserialize: @Sendable (ByteBuffer) throws -> Output
 
   init<Deserializer: MessageDeserializer>(
     wrapping other: Deserializer

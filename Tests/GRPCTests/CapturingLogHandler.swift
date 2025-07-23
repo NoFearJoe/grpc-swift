@@ -21,7 +21,7 @@ import struct Foundation.Date
 import class Foundation.DateFormatter
 
 /// A `LogHandler` factory which captures all logs emitted by the handlers it makes.
-internal class CapturingLogHandlerFactory {
+internal class CapturingLogHandlerFactory: @unchecked Sendable {
   private var lock = NIOLock()
   private var _logs: [CapturedLog] = []
 
@@ -60,7 +60,7 @@ internal class CapturingLogHandlerFactory {
 }
 
 /// A captured log.
-internal struct CapturedLog {
+internal struct CapturedLog: Sendable {
   var label: String
   var level: Logger.Level
   var message: Logger.Message
@@ -74,13 +74,13 @@ internal struct CapturedLog {
 
 /// A log handler which captures all logs it records.
 internal struct CapturingLogHandler: LogHandler {
-  private let capture: (CapturedLog) -> Void
+  private let capture: @Sendable (CapturedLog) -> Void
 
   internal let label: String
   internal var metadata: Logger.Metadata = [:]
   internal var logLevel: Logger.Level = .trace
 
-  fileprivate init(label: String, capture: @escaping (CapturedLog) -> Void) {
+  fileprivate init(label: String, capture: @Sendable @escaping (CapturedLog) -> Void) {
     self.label = label
     self.capture = capture
   }

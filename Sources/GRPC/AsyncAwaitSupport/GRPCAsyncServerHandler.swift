@@ -15,7 +15,7 @@
  */
 import DequeModule
 import Logging
-import NIOCore
+@preconcurrency import NIOCore
 import NIOHPACK
 
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
@@ -24,7 +24,7 @@ public struct GRPCAsyncServerHandler<
   Deserializer: MessageDeserializer,
   Request: Sendable,
   Response: Sendable
->: GRPCServerHandlerProtocol where Serializer.Input == Response, Deserializer.Output == Request {
+>: Sendable, GRPCServerHandlerProtocol where Serializer.Input == Response, Deserializer.Output == Request {
   @usableFromInline
   internal let _handler: AsyncServerHandler<Serializer, Deserializer, Request, Response>
 
@@ -166,7 +166,7 @@ internal final class AsyncServerHandler<
   Deserializer: MessageDeserializer,
   Request: Sendable,
   Response: Sendable
->: GRPCServerHandlerProtocol where Serializer.Input == Response, Deserializer.Output == Request {
+>: @unchecked Sendable, GRPCServerHandlerProtocol where Serializer.Input == Response, Deserializer.Output == Request {
   /// A response serializer.
   @usableFromInline
   internal let serializer: Serializer
@@ -455,11 +455,13 @@ internal final class AsyncServerHandler<
         elementType: Request.self,
         failureType: Error.self,
         backPressureStrategy: backpressureStrategy,
+        finishOnDeinit: true,
         delegate: GRPCAsyncSequenceProducerDelegate()
       )
 
       let responseWriter = NIOAsyncWriter.makeWriter(
         isWritable: true,
+        finishOnDeinit: true,
         delegate: GRPCAsyncWriterSinkDelegate<(Response, Compression)>(
           didYield: self.interceptResponseMessages,
           didTerminate: { error in
@@ -867,7 +869,7 @@ internal struct ServerHandlerComponents<
   Request: Sendable,
   Response: Sendable,
   Delegate: NIOAsyncWriterSinkDelegate
-> where Delegate.Element == (Response, Compression) {
+>: Sendable where Delegate.Element == (Response, Compression) {
   @usableFromInline
   internal typealias AsyncWriterSink = NIOAsyncWriter<(Response, Compression), Delegate>.Sink
 
@@ -910,3 +912,6 @@ internal struct ServerHandlerComponents<
     self.task.cancel()
   }
 }
+
+@available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
+extension NIOAsyncWriter.NewWriter: @retroactive @unchecked Sendable {}

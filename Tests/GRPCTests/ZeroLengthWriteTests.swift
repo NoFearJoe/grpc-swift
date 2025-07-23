@@ -25,6 +25,7 @@ import NIOSSL
 import NIOTransportServices
 import XCTest
 
+@MainActor
 final class ZeroLengthWriteTests: GRPCTestCase {
   func clientBuilder(
     group: EventLoopGroup,
@@ -117,7 +118,7 @@ final class ZeroLengthWriteTests: GRPCTestCase {
   }
 
   func debugPipelineExpectation(
-    _ callback: @escaping (Result<NIOFilterEmptyWritesHandler, Error>) -> Void
+    _ callback: @Sendable @escaping (Result<NIOFilterEmptyWritesHandler, Error>) -> Void
   ) -> GRPCChannelInitializer {
     return { channel in
       channel.pipeline.handler(type: NIOFilterEmptyWritesHandler.self).always { result in
@@ -129,8 +130,8 @@ final class ZeroLengthWriteTests: GRPCTestCase {
   private func _runTest(
     networkPreference: NetworkPreference,
     secure: Bool,
-    clientHandlerCallback: @escaping (Result<NIOFilterEmptyWritesHandler, Error>) -> Void,
-    serverHandlerCallback: @escaping (Result<NIOFilterEmptyWritesHandler, Error>) -> Void
+    clientHandlerCallback: @Sendable @escaping (Result<NIOFilterEmptyWritesHandler, Error>) -> Void,
+    serverHandlerCallback: @Sendable @escaping (Result<NIOFilterEmptyWritesHandler, Error>) -> Void
   ) {
     // We can only run this test on platforms where the zero-length write workaround _could_ be added.
     #if canImport(Network)

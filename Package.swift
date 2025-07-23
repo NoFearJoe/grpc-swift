@@ -1,4 +1,4 @@
-// swift-tools-version:5.10
+// swift-tools-version:6.0
 /*
  * Copyright 2017, gRPC Authors All rights reserved.
  *
@@ -80,61 +80,61 @@ let packageDependencies: [Package.Dependency] = [
 
 extension Target.Dependency {
   // Target dependencies; external
-  static let grpc: Self = .target(name: grpcTargetName)
-  static let cgrpcZlib: Self = .target(name: cgrpcZlibTargetName)
-  static let protocGenGRPCSwift: Self = .target(name: "protoc-gen-grpc-swift")
-  static let reflectionService: Self = .target(name: "GRPCReflectionService")
+  nonisolated(unsafe) static let grpc: Self = .target(name: grpcTargetName)
+  nonisolated(unsafe) static let cgrpcZlib: Self = .target(name: cgrpcZlibTargetName)
+  nonisolated(unsafe) static let protocGenGRPCSwift: Self = .target(name: "protoc-gen-grpc-swift")
+  nonisolated(unsafe) static let reflectionService: Self = .target(name: "GRPCReflectionService")
 
   // Target dependencies; internal
-  static let grpcSampleData: Self = .target(name: "GRPCSampleData")
-  static let echoModel: Self = .target(name: "EchoModel")
-  static let echoImplementation: Self = .target(name: "EchoImplementation")
-  static let helloWorldModel: Self = .target(name: "HelloWorldModel")
-  static let routeGuideModel: Self = .target(name: "RouteGuideModel")
-  static let interopTestModels: Self = .target(name: "GRPCInteroperabilityTestModels")
-  static let interopTestImplementation: Self =
+  nonisolated(unsafe) static let grpcSampleData: Self = .target(name: "GRPCSampleData")
+  nonisolated(unsafe) static let echoModel: Self = .target(name: "EchoModel")
+  nonisolated(unsafe) static let echoImplementation: Self = .target(name: "EchoImplementation")
+  nonisolated(unsafe) static let helloWorldModel: Self = .target(name: "HelloWorldModel")
+  nonisolated(unsafe) static let routeGuideModel: Self = .target(name: "RouteGuideModel")
+  nonisolated(unsafe) static let interopTestModels: Self = .target(name: "GRPCInteroperabilityTestModels")
+  nonisolated(unsafe) static let interopTestImplementation: Self =
     .target(name: "GRPCInteroperabilityTestsImplementation")
-  static let interoperabilityTests: Self = .target(name: "InteroperabilityTests")
+  nonisolated(unsafe) static let interoperabilityTests: Self = .target(name: "InteroperabilityTests")
 
   // Product dependencies
-  static let argumentParser: Self = .product(
+  nonisolated(unsafe) static let argumentParser: Self = .product(
     name: "ArgumentParser",
     package: "swift-argument-parser"
   )
-  static let nio: Self = .product(name: "NIO", package: "swift-nio")
-  static let nioConcurrencyHelpers: Self = .product(
+  nonisolated(unsafe) static let nio: Self = .product(name: "NIO", package: "swift-nio")
+  nonisolated(unsafe) static let nioConcurrencyHelpers: Self = .product(
     name: "NIOConcurrencyHelpers",
     package: "swift-nio"
   )
-  static let nioCore: Self = .product(name: "NIOCore", package: "swift-nio")
-  static let nioEmbedded: Self = .product(name: "NIOEmbedded", package: "swift-nio")
-  static let nioExtras: Self = .product(name: "NIOExtras", package: "swift-nio-extras")
-  static let nioFoundationCompat: Self = .product(name: "NIOFoundationCompat", package: "swift-nio")
-  static let nioHTTP1: Self = .product(name: "NIOHTTP1", package: "swift-nio")
-  static let nioHTTP2: Self = .product(name: "NIOHTTP2", package: "swift-nio-http2")
-  static let nioPosix: Self = .product(name: "NIOPosix", package: "swift-nio")
-  static let nioSSL: Self = .product(name: "NIOSSL", package: "swift-nio-ssl")
-  static let nioTLS: Self = .product(name: "NIOTLS", package: "swift-nio")
-  static let nioTransportServices: Self = .product(
+  nonisolated(unsafe) static let nioCore: Self = .product(name: "NIOCore", package: "swift-nio")
+  nonisolated(unsafe) static let nioEmbedded: Self = .product(name: "NIOEmbedded", package: "swift-nio")
+  nonisolated(unsafe) static let nioExtras: Self = .product(name: "NIOExtras", package: "swift-nio-extras")
+  nonisolated(unsafe) static let nioFoundationCompat: Self = .product(name: "NIOFoundationCompat", package: "swift-nio")
+  nonisolated(unsafe) static let nioHTTP1: Self = .product(name: "NIOHTTP1", package: "swift-nio")
+  nonisolated(unsafe) static let nioHTTP2: Self = .product(name: "NIOHTTP2", package: "swift-nio-http2")
+  nonisolated(unsafe) static let nioPosix: Self = .product(name: "NIOPosix", package: "swift-nio")
+  nonisolated(unsafe) static let nioSSL: Self = .product(name: "NIOSSL", package: "swift-nio-ssl")
+  nonisolated(unsafe) static let nioTLS: Self = .product(name: "NIOTLS", package: "swift-nio")
+  nonisolated(unsafe) static let nioTransportServices: Self = .product(
     name: "NIOTransportServices",
     package: "swift-nio-transport-services"
   )
-  static let nioTestUtils: Self = .product(name: "NIOTestUtils", package: "swift-nio")
-  static let nioFileSystem: Self = .product(name: "_NIOFileSystem", package: "swift-nio")
-  static let logging: Self = .product(name: "Logging", package: "swift-log")
-  static let protobuf: Self = .product(name: "SwiftProtobuf", package: "swift-protobuf")
-  static let protobufPluginLibrary: Self = .product(
+  nonisolated(unsafe) static let nioTestUtils: Self = .product(name: "NIOTestUtils", package: "swift-nio")
+  nonisolated(unsafe) static let nioFileSystem: Self = .product(name: "_NIOFileSystem", package: "swift-nio")
+  nonisolated(unsafe) static let logging: Self = .product(name: "Logging", package: "swift-log")
+  nonisolated(unsafe) static let protobuf: Self = .product(name: "SwiftProtobuf", package: "swift-protobuf")
+  nonisolated(unsafe) static let protobufPluginLibrary: Self = .product(
     name: "SwiftProtobufPluginLibrary",
     package: "swift-protobuf"
   )
-  static let atomics: Self = .product(name: "Atomics", package: "swift-atomics")
-  static let dequeModule: Self = .product(name: "DequeModule", package: "swift-collections")
+  nonisolated(unsafe) static let atomics: Self = .product(name: "Atomics", package: "swift-atomics")
+  nonisolated(unsafe) static let dequeModule: Self = .product(name: "DequeModule", package: "swift-collections")
 }
 
 // MARK: - Targets
 
 extension Target {
-  static let grpc: Target = .target(
+  nonisolated(unsafe) static let grpc: Target = .target(
     name: grpcTargetName,
     dependencies: [
       .cgrpcZlib,
@@ -158,7 +158,7 @@ extension Target {
     path: "Sources/GRPC"
   )
 
-  static let cgrpcZlib: Target = .target(
+  nonisolated(unsafe) static let cgrpcZlib: Target = .target(
     name: cgrpcZlibTargetName,
     path: "Sources/CGRPCZlib",
     linkerSettings: [
@@ -166,7 +166,7 @@ extension Target {
     ]
   )
 
-  static let protocGenGRPCSwift: Target = .executableTarget(
+  nonisolated(unsafe) static let protocGenGRPCSwift: Target = .executableTarget(
     name: "protoc-gen-grpc-swift",
     dependencies: [
       .protobuf,
@@ -177,7 +177,7 @@ extension Target {
     ]
   )
 
-  static let grpcSwiftPlugin: Target = .plugin(
+  nonisolated(unsafe) static let grpcSwiftPlugin: Target = .plugin(
     name: "GRPCSwiftPlugin",
     capability: .buildTool(),
     dependencies: [
@@ -185,7 +185,7 @@ extension Target {
     ]
   )
 
-  static let grpcTests: Target = .testTarget(
+  nonisolated(unsafe) static let grpcTests: Target = .testTarget(
     name: "GRPCTests",
     dependencies: [
       .grpc,
@@ -214,7 +214,7 @@ extension Target {
     ]
   )
 
-  static let interopTestModels: Target = .target(
+  nonisolated(unsafe) static let interopTestModels: Target = .target(
     name: "GRPCInteroperabilityTestModels",
     dependencies: [
       .grpc,
@@ -232,7 +232,7 @@ extension Target {
     ]
   )
 
-  static let interopTestImplementation: Target = .target(
+  nonisolated(unsafe) static let interopTestImplementation: Target = .target(
     name: "GRPCInteroperabilityTestsImplementation",
     dependencies: [
       .grpc,
@@ -246,7 +246,7 @@ extension Target {
     )
   )
 
-  static let interopTests: Target = .executableTarget(
+  nonisolated(unsafe) static let interopTests: Target = .executableTarget(
     name: "GRPCInteroperabilityTests",
     dependencies: [
       .grpc,
@@ -258,7 +258,7 @@ extension Target {
     ]
   )
 
-  static let backoffInteropTest: Target = .executableTarget(
+  nonisolated(unsafe) static let backoffInteropTest: Target = .executableTarget(
     name: "GRPCConnectionBackoffInteropTest",
     dependencies: [
       .grpc,
@@ -273,7 +273,7 @@ extension Target {
     ]
   )
 
-  static let perfTests: Target = .executableTarget(
+  nonisolated(unsafe) static let perfTests: Target = .executableTarget(
     name: "GRPCPerformanceTests",
     dependencies: [
       .grpc,
@@ -286,7 +286,7 @@ extension Target {
     ]
   )
 
-  static let grpcSampleData: Target = .target(
+  nonisolated(unsafe) static let grpcSampleData: Target = .target(
     name: "GRPCSampleData",
     dependencies: includeNIOSSL ? [.nioSSL] : [],
     exclude: [
@@ -294,7 +294,7 @@ extension Target {
     ]
   )
 
-  static let echoModel: Target = .target(
+  nonisolated(unsafe) static let echoModel: Target = .target(
     name: "EchoModel",
     dependencies: [
       .grpc,
@@ -304,7 +304,7 @@ extension Target {
     path: "Examples/v1/Echo/Model"
   )
 
-  static let echoImplementation: Target = .target(
+  nonisolated(unsafe) static let echoImplementation: Target = .target(
     name: "EchoImplementation",
     dependencies: [
       .echoModel,
@@ -316,7 +316,7 @@ extension Target {
     path: "Examples/v1/Echo/Implementation"
   )
 
-  static let echo: Target = .executableTarget(
+  nonisolated(unsafe) static let echo: Target = .executableTarget(
     name: "Echo",
     dependencies: [
       .grpc,
@@ -333,7 +333,7 @@ extension Target {
     path: "Examples/v1/Echo/Runtime"
   )
 
-  static let helloWorldModel: Target = .target(
+  nonisolated(unsafe) static let helloWorldModel: Target = .target(
     name: "HelloWorldModel",
     dependencies: [
       .grpc,
@@ -343,7 +343,7 @@ extension Target {
     path: "Examples/v1/HelloWorld/Model"
   )
 
-  static let helloWorldClient: Target = .executableTarget(
+  nonisolated(unsafe) static let helloWorldClient: Target = .executableTarget(
     name: "HelloWorldClient",
     dependencies: [
       .grpc,
@@ -355,7 +355,7 @@ extension Target {
     path: "Examples/v1/HelloWorld/Client"
   )
 
-  static let helloWorldServer: Target = .executableTarget(
+  nonisolated(unsafe) static let helloWorldServer: Target = .executableTarget(
     name: "HelloWorldServer",
     dependencies: [
       .grpc,
@@ -367,7 +367,7 @@ extension Target {
     path: "Examples/v1/HelloWorld/Server"
   )
 
-  static let routeGuideModel: Target = .target(
+  nonisolated(unsafe) static let routeGuideModel: Target = .target(
     name: "RouteGuideModel",
     dependencies: [
       .grpc,
@@ -377,7 +377,7 @@ extension Target {
     path: "Examples/v1/RouteGuide/Model"
   )
 
-  static let routeGuideClient: Target = .executableTarget(
+  nonisolated(unsafe) static let routeGuideClient: Target = .executableTarget(
     name: "RouteGuideClient",
     dependencies: [
       .grpc,
@@ -389,7 +389,7 @@ extension Target {
     path: "Examples/v1/RouteGuide/Client"
   )
 
-  static let routeGuideServer: Target = .executableTarget(
+  nonisolated(unsafe) static let routeGuideServer: Target = .executableTarget(
     name: "RouteGuideServer",
     dependencies: [
       .grpc,
@@ -402,7 +402,7 @@ extension Target {
     path: "Examples/v1/RouteGuide/Server"
   )
 
-  static let packetCapture: Target = .executableTarget(
+  nonisolated(unsafe) static let packetCapture: Target = .executableTarget(
     name: "PacketCapture",
     dependencies: [
       .grpc,
@@ -418,7 +418,7 @@ extension Target {
     ]
   )
 
-  static let reflectionService: Target = .target(
+  nonisolated(unsafe) static let reflectionService: Target = .target(
     name: "GRPCReflectionService",
     dependencies: [
       .grpc,
@@ -428,7 +428,7 @@ extension Target {
     path: "Sources/GRPCReflectionService"
   )
 
-  static let reflectionServer: Target = .executableTarget(
+  nonisolated(unsafe) static let reflectionServer: Target = .executableTarget(
     name: "ReflectionServer",
     dependencies: [
       .grpc,
@@ -450,27 +450,27 @@ extension Target {
 // MARK: - Products
 
 extension Product {
-  static let grpc: Product = .library(
+  nonisolated(unsafe) static let grpc: Product = .library(
     name: grpcProductName,
     targets: [grpcTargetName]
   )
 
-  static let cgrpcZlib: Product = .library(
+  nonisolated(unsafe) static let cgrpcZlib: Product = .library(
     name: cgrpcZlibProductName,
     targets: [cgrpcZlibTargetName]
   )
 
-  static let grpcReflectionService: Product = .library(
+  nonisolated(unsafe) static let grpcReflectionService: Product = .library(
     name: "GRPCReflectionService",
     targets: ["GRPCReflectionService"]
   )
 
-  static let protocGenGRPCSwift: Product = .executable(
+  nonisolated(unsafe) static let protocGenGRPCSwift: Product = .executable(
     name: "protoc-gen-grpc-swift",
     targets: ["protoc-gen-grpc-swift"]
   )
 
-  static let grpcSwiftPlugin: Product = .plugin(
+  nonisolated(unsafe) static let grpcSwiftPlugin: Product = .plugin(
     name: "GRPCSwiftPlugin",
     targets: ["GRPCSwiftPlugin"]
   )

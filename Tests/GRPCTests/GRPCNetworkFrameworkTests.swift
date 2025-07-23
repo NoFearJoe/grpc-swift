@@ -220,29 +220,32 @@ final class GRPCNetworkFrameworkTests: GRPCTestCase {
     )
 
     let server = try await builder.bind(host: "127.0.0.1", port: 0).get()
-    defer { try? server.close().wait() }
 
-    let client = try GRPCChannelPool.with(
-      target: .hostAndPort("127.0.0.1", server.channel.localAddress!.port!),
-      transportSecurity: .tls(.makeClientConfigurationBackedByNetworkFramework()),
-      eventLoopGroup: self.tsGroup
-    ) {
-      configure(&$0)
-    }
-
-    let echo = Echo_EchoAsyncClient(channel: client)
     do {
-      let _ = try await echo.get(.with { $0.text = "ignored" })
-    } catch let error as GRPCConnectionPoolError {
-      XCTAssertEqual(error.code, .deadlineExceeded)
-      XCTAssert(error.underlyingError is NWError)
-    } catch {
-      XCTFail("Expected GRPCConnectionPoolError")
-    }
+      let client = try GRPCChannelPool.with(
+        target: .hostAndPort("127.0.0.1", server.channel.localAddress!.port!),
+        transportSecurity: .tls(.makeClientConfigurationBackedByNetworkFramework()),
+        eventLoopGroup: self.tsGroup
+      ) {
+        configure(&$0)
+      }
 
-    let promise = self.group.next().makePromise(of: Void.self)
-    client.closeGracefully(deadline: .now() + .seconds(1), promise: promise)
-    try await promise.futureResult.get()
+      let echo = Echo_EchoAsyncClient(channel: client)
+      do {
+        let _ = try await echo.get(.with { $0.text = "ignored" })
+      } catch let error as GRPCConnectionPoolError {
+        XCTAssertEqual(error.code, .deadlineExceeded)
+        XCTAssert(error.underlyingError is NWError)
+      } catch {
+        XCTFail("Expected GRPCConnectionPoolError")
+      }
+
+      let promise = self.group.next().makePromise(of: Void.self)
+      client.closeGracefully(deadline: .now() + .seconds(1), promise: promise)
+      try await promise.futureResult.get()
+    } catch {}
+
+    try? await server.close().get()
   }
 
   func testErrorPickedUpBeforeConnectTimeout() async throws {

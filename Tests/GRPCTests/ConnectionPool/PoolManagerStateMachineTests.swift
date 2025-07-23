@@ -331,7 +331,7 @@ extension PoolManagerStateMachine.ShutdownAction {
 }
 
 /// An `EventLoopGroup` of `EmbeddedEventLoop`s.
-private final class EmbeddedEventLoopGroup: EventLoopGroup {
+private final class EmbeddedEventLoopGroup: @unchecked Sendable, EventLoopGroup {
   internal let loops: [EmbeddedEventLoop]
 
   internal let lock = NIOLock()

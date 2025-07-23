@@ -217,7 +217,7 @@ public struct GRPCTLSConfiguration: Sendable {
 // canImport(NIOSSL)
 #if canImport(NIOSSL)
 extension GRPCTLSConfiguration {
-  internal struct NIOConfiguration {
+  internal struct NIOConfiguration: @unchecked Sendable {
     var configuration: TLSConfiguration
     var customVerificationCallback: NIOSSLCustomVerificationCallback?
     var hostnameOverride: String?
@@ -488,7 +488,7 @@ extension GRPCTLSConfiguration {
 
 #if canImport(Network)
 extension GRPCTLSConfiguration {
-  internal struct NetworkConfiguration {
+  internal struct NetworkConfiguration: @unchecked Sendable {
     @available(macOS 10.14, iOS 12.0, watchOS 6.0, tvOS 12.0, *)
     internal var options: NWProtocolTLS.Options {
       get {

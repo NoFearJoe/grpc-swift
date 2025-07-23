@@ -68,7 +68,7 @@ public enum Grpc_Testing_PayloadType: SwiftProtobuf.Enum {
 
 extension Grpc_Testing_PayloadType: CaseIterable {
   // The compiler won't synthesize support with the UNRECOGNIZED case.
-  public static var allCases: [Grpc_Testing_PayloadType] = [
+  public static let allCases: [Grpc_Testing_PayloadType] = [
     .compressable,
   ]
 }
@@ -408,19 +408,19 @@ public struct Grpc_Testing_ReconnectInfo {
 }
 
 #if swift(>=5.5) && canImport(_Concurrency)
-extension Grpc_Testing_PayloadType: @unchecked Sendable {}
-extension Grpc_Testing_BoolValue: @unchecked Sendable {}
-extension Grpc_Testing_Payload: @unchecked Sendable {}
-extension Grpc_Testing_EchoStatus: @unchecked Sendable {}
-extension Grpc_Testing_SimpleRequest: @unchecked Sendable {}
-extension Grpc_Testing_SimpleResponse: @unchecked Sendable {}
-extension Grpc_Testing_StreamingInputCallRequest: @unchecked Sendable {}
-extension Grpc_Testing_StreamingInputCallResponse: @unchecked Sendable {}
-extension Grpc_Testing_ResponseParameters: @unchecked Sendable {}
-extension Grpc_Testing_StreamingOutputCallRequest: @unchecked Sendable {}
-extension Grpc_Testing_StreamingOutputCallResponse: @unchecked Sendable {}
-extension Grpc_Testing_ReconnectParams: @unchecked Sendable {}
-extension Grpc_Testing_ReconnectInfo: @unchecked Sendable {}
+extension Grpc_Testing_PayloadType: Sendable {}
+extension Grpc_Testing_BoolValue: Sendable {}
+extension Grpc_Testing_Payload: Sendable {}
+extension Grpc_Testing_EchoStatus: Sendable {}
+extension Grpc_Testing_SimpleRequest: Sendable {}
+extension Grpc_Testing_SimpleResponse: Sendable {}
+extension Grpc_Testing_StreamingInputCallRequest: Sendable {}
+extension Grpc_Testing_StreamingInputCallResponse: Sendable {}
+extension Grpc_Testing_ResponseParameters: Sendable {}
+extension Grpc_Testing_StreamingOutputCallRequest: Sendable {}
+extension Grpc_Testing_StreamingOutputCallResponse: Sendable {}
+extension Grpc_Testing_ReconnectParams: Sendable {}
+extension Grpc_Testing_ReconnectInfo: Sendable {}
 #endif  // swift(>=5.5) && canImport(_Concurrency)
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.

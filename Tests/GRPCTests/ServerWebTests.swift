@@ -28,6 +28,7 @@ import FoundationNetworking
 // Only test Unary and ServerStreaming, as ClientStreaming is not
 // supported in HTTP1.
 // TODO: Add tests for application/grpc-web as well.
+@MainActor
 class ServerWebTests: EchoTestCaseBase {
   private func gRPCEncodedEchoRequest(_ text: String) -> Data {
     var request = Echo_EchoRequest()
@@ -60,7 +61,7 @@ class ServerWebTests: EchoTestCaseBase {
   private func sendOverHTTP1(
     rpcMethod: String,
     message: String?,
-    handler: @escaping (Data?, Error?) -> Void
+    handler: @Sendable @escaping (Data?, Error?) -> Void
   ) {
     let serverURL = URL(string: "http://localhost:\(self.port!)/echo.Echo/\(rpcMethod)")!
     var request = URLRequest(url: serverURL)

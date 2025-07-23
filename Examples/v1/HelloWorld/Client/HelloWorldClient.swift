@@ -34,36 +34,33 @@ struct HelloWorld: AsyncParsableCommand {
     // See: https://github.com/apple/swift-nio#eventloops-and-eventloopgroups
     let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
 
-    // Make sure the group is shutdown when we're done with it.
-    defer {
-      try! group.syncShutdownGracefully()
-    }
-
-    // Configure the channel, we're not using TLS so the connection is `insecure`.
-    let channel = try GRPCChannelPool.with(
-      target: .host("localhost", port: self.port),
-      transportSecurity: .plaintext,
-      eventLoopGroup: group
-    )
-
-    // Close the connection when we're done with it.
-    defer {
-      try! channel.close().wait()
-    }
-
-    // Provide the connection to the generated client.
-    let greeter = Helloworld_GreeterAsyncClient(channel: channel)
-
-    // Form the request with the name, if one was provided.
-    let request = Helloworld_HelloRequest.with {
-      $0.name = self.name ?? ""
-    }
-
     do {
-      let greeting = try await greeter.sayHello(request)
-      print("Greeter received: \(greeting.message)")
-    } catch {
-      print("Greeter failed: \(error)")
-    }
+      // Configure the channel, we're not using TLS so the connection is `insecure`.
+      let channel = try GRPCChannelPool.with(
+        target: .host("localhost", port: self.port),
+        transportSecurity: .plaintext,
+        eventLoopGroup: group
+      )
+
+      // Provide the connection to the generated client.
+      let greeter = Helloworld_GreeterAsyncClient(channel: channel)
+
+      // Form the request with the name, if one was provided.
+      let request = Helloworld_HelloRequest.with {
+        $0.name = self.name ?? ""
+      }
+
+      do {
+        let greeting = try await greeter.sayHello(request)
+        print("Greeter received: \(greeting.message)")
+      } catch {
+        print("Greeter failed: \(error)")
+      }
+
+      // Close the connection when we're done with it.
+      try! await channel.close().get()
+    } catch {}
+
+    try! await group.shutdownGracefully()
   }
 }

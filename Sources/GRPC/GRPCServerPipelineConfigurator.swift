@@ -26,7 +26,7 @@ import NIOTLS
 /// If TLS is enabled then the handler listens for an 'TLSUserEvent.handshakeCompleted' event and
 /// configures the pipeline appropriately for the protocol negotiated via ALPN. If TLS is not
 /// configured then the HTTP version is determined by parsing the inbound byte stream.
-final class GRPCServerPipelineConfigurator: ChannelInboundHandler, RemovableChannelHandler {
+final class GRPCServerPipelineConfigurator: @unchecked Sendable, ChannelInboundHandler, RemovableChannelHandler {
   internal typealias InboundIn = ByteBuffer
   internal typealias InboundOut = ByteBuffer
 
