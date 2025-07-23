@@ -106,6 +106,7 @@ public struct GRPCAsyncServerStreamingCall<Request: Sendable, Response: Sendable
       elementType: Response.self,
       failureType: Error.self,
       backPressureStrategy: backpressureStrategy,
+      finishOnDeinit: true,
       delegate: GRPCAsyncSequenceProducerDelegate()
     )
 

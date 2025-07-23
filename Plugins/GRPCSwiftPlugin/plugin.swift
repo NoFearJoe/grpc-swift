@@ -261,7 +261,7 @@ extension GRPCSwiftPlugin: BuildToolPlugin {
       throw PluginError.invalidTarget("\(type(of: target))")
     }
 
-    let workDirectory = PathLike(context.pluginWorkDirectory)
+    let workDirectory = PathLike(context.pluginWorkDirectoryURL.path())
 
     return try self.createBuildCommands(
       pluginWorkDirectory: workDirectory,

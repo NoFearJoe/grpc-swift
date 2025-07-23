@@ -150,7 +150,7 @@ final class GRPCServerPipelineConfigurator: @unchecked Sendable, ChannelInboundH
   private func configurationCompleted(result: Result<Void, Error>, context: ChannelHandlerContext) {
     switch result {
     case .success:
-      context.pipeline.removeHandler(context: context, promise: nil)
+      context.pipeline.syncOperations.removeHandler(context: context, promise: nil)
     case let .failure(error):
       self.errorCaught(context: context, error: error)
     }

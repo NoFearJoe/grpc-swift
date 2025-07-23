@@ -140,6 +140,7 @@ extension Target {
       .cgrpcZlib,
       .nio,
       .nioCore,
+      .nioConcurrencyHelpers,
       .nioPosix,
       .nioEmbedded,
       .nioFoundationCompat,

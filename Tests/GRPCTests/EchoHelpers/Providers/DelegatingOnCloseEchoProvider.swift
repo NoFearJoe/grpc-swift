@@ -22,13 +22,13 @@ import NIOCore
 class OnCloseEchoProvider: Echo_EchoProvider {
   let interceptors: Echo_EchoServerInterceptorFactoryProtocol?
 
-  let onClose: (Result<Void, Error>) -> Void
+  let onClose: @Sendable (Result<Void, Error>) -> Void
   let delegate: Echo_EchoProvider
 
   init(
     delegate: Echo_EchoProvider,
     interceptors: Echo_EchoServerInterceptorFactoryProtocol? = nil,
-    onClose: @escaping (Result<Void, Error>) -> Void
+    onClose: @Sendable @escaping (Result<Void, Error>) -> Void
   ) {
     self.delegate = delegate
     self.onClose = onClose

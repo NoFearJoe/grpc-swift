@@ -15,11 +15,12 @@
  */
 import NIOCore
 import NIOHPACK
+import NIOConcurrencyHelpers
 
 public final class BidirectionalStreamingServerHandler<
   Serializer: MessageSerializer,
   Deserializer: MessageDeserializer
->: GRPCServerHandlerProtocol {
+>: @unchecked Sendable, GRPCServerHandlerProtocol {
   public typealias Request = Deserializer.Output
   public typealias Response = Serializer.Input
 
@@ -70,6 +71,9 @@ public final class BidirectionalStreamingServerHandler<
     case completed
   }
 
+  @usableFromInline
+  internal let lock = NIOLock()
+
   @inlinable
   public init(
     context: CallHandlerContext,
@@ -104,14 +108,16 @@ public final class BidirectionalStreamingServerHandler<
 
   @inlinable
   public func receiveMetadata(_ headers: HPACKHeaders) {
-    self.interceptors.receive(.metadata(headers))
+    let interceptors = self.lock.withLock { self.interceptors }
+    interceptors?.receive(.metadata(headers))
   }
 
   @inlinable
   public func receiveMessage(_ bytes: ByteBuffer) {
     do {
       let message = try self.deserializer.deserialize(byteBuffer: bytes)
-      self.interceptors.receive(.message(message))
+      let interceptors = self.lock.withLock { self.interceptors }
+      interceptors?.receive(.message(message))
     } catch {
       self.handleError(error)
     }
@@ -119,7 +125,8 @@ public final class BidirectionalStreamingServerHandler<
 
   @inlinable
   public func receiveEnd() {
-    self.interceptors.receive(.end)
+    let interceptors = self.lock.withLock { self.interceptors }
+    interceptors?.receive(.end)
   }
 
   @inlinable
@@ -130,20 +137,26 @@ public final class BidirectionalStreamingServerHandler<
 
   @inlinable
   public func finish() {
-    switch self.state {
+    switch self.lock.withLock({ self.state }) {
     case .idle:
-      self.interceptors = nil
-      self.state = .completed
+      self.lock.withLock {
+        self.interceptors = nil
+        self.state = .completed
+      }
 
     case let .creatingObserver(context),
       let .observing(_, context):
       context.statusPromise.fail(GRPCStatus(code: .unavailable, message: nil))
       self.context.eventLoop.execute {
-        self.interceptors = nil
+        self.lock.withLock {
+          self.interceptors = nil
+        }
       }
 
     case .completed:
-      self.interceptors = nil
+      self.lock.withLock {
+        self.interceptors = nil
+      }
     }
   }
 
@@ -163,7 +176,7 @@ public final class BidirectionalStreamingServerHandler<
 
   @inlinable
   internal func receiveInterceptedMetadata(_ headers: HPACKHeaders) {
-    switch self.state {
+    switch self.lock.withLock({ self.state }) {
     case .idle:
       // Make a context to invoke the observer block factory with.
       let context = _StreamingResponseCallContext<Request, Response>(
@@ -176,11 +189,14 @@ public final class BidirectionalStreamingServerHandler<
         sendResponse: self.interceptResponse(_:metadata:promise:)
       )
 
-      // Move to the next state.
-      self.state = .creatingObserver(context)
+      self.lock.withLock {
+        // Move to the next state.
+        self.state = .creatingObserver(context)
+      }
 
       // Send response headers back via the interceptors.
-      self.interceptors.send(.metadata([:]), promise: nil)
+      let interceptors = self.lock.withLock { self.interceptors }
+      interceptors?.send(.metadata([:]), promise: nil)
 
       // Register callbacks on the status future.
       context.statusPromise.futureResult.whenComplete(self.userFunctionStatusResolved(_:))
@@ -201,11 +217,13 @@ public final class BidirectionalStreamingServerHandler<
 
   @inlinable
   internal func receiveInterceptedMessage(_ request: Request) {
-    switch self.state {
+    switch self.lock.withLock({ self.state }) {
     case .idle:
       self.handleError(GRPCError.ProtocolViolation("Message received before headers"))
     case .creatingObserver:
-      self.requestBuffer.append(.message(request))
+      self.lock.withLock {
+        self.requestBuffer.append(.message(request))
+      }
     case let .observing(observer, _):
       observer(.message(request))
     case .completed:
@@ -217,11 +235,13 @@ public final class BidirectionalStreamingServerHandler<
 
   @inlinable
   internal func receiveInterceptedEnd() {
-    switch self.state {
+    switch self.lock.withLock({ self.state }) {
     case .idle:
       self.handleError(GRPCError.ProtocolViolation("End of stream received before headers"))
     case .creatingObserver:
-      self.requestBuffer.append(.end)
+      self.lock.withLock {
+        self.requestBuffer.append(.end)
+      }
     case let .observing(observer, _):
       observer(.end)
     case .completed:
@@ -237,7 +257,7 @@ public final class BidirectionalStreamingServerHandler<
   internal func userFunctionResolvedWithResult(
     _ result: Result<(StreamEvent<Request>) -> Void, Error>
   ) {
-    switch self.state {
+    switch self.lock.withLock({ self.state }) {
     case .idle, .observing:
       // The observer block can't resolve if it hasn't been created ('idle') and it can't be
       // resolved more than once ('observing').
@@ -247,8 +267,10 @@ public final class BidirectionalStreamingServerHandler<
       switch result {
       case let .success(observer):
         // We have an observer block now; unbuffer any requests.
-        self.state = .observing(observer, context)
-        while let request = self.requestBuffer.popFirst() {
+        self.lock.withLock {
+          self.state = .observing(observer, context)
+        }
+        while let request = self.lock.withLock({ self.requestBuffer.popFirst() }) {
           observer(request)
         }
 
@@ -268,7 +290,7 @@ public final class BidirectionalStreamingServerHandler<
     metadata: MessageMetadata,
     promise: EventLoopPromise<Void>?
   ) {
-    switch self.state {
+    switch self.lock.withLock({ self.state }) {
     case .idle:
       // The observer block can't end responses if it doesn't exist!
       preconditionFailure()
@@ -276,7 +298,8 @@ public final class BidirectionalStreamingServerHandler<
     case .creatingObserver, .observing:
       // The user has access to the response context before returning a future observer,
       // so 'creatingObserver' is valid here (if a little strange).
-      self.interceptors.send(.message(response, metadata), promise: promise)
+      let interceptors = self.lock.withLock { self.interceptors }
+      interceptors?.send(.message(response, metadata), promise: promise)
 
     case .completed:
       promise?.fail(GRPCError.AlreadyComplete())
@@ -285,7 +308,7 @@ public final class BidirectionalStreamingServerHandler<
 
   @inlinable
   internal func userFunctionStatusResolved(_ result: Result<GRPCStatus, Error>) {
-    switch self.state {
+    switch self.lock.withLock({ self.state }) {
     case .idle:
       // The promise can't fail before we create it.
       preconditionFailure()
@@ -295,8 +318,11 @@ public final class BidirectionalStreamingServerHandler<
       switch result {
       case let .success(status):
         // We're sending end back, we're done.
-        self.state = .completed
-        self.interceptors.send(.end(status, context.trailers), promise: nil)
+        self.lock.withLock {
+          self.state = .completed
+        }
+        let interceptors = self.lock.withLock { self.interceptors }
+        interceptors?.send(.end(status, context.trailers), promise: nil)
 
       case let .failure(error):
         self.handleError(error, thrownFromHandler: true)
@@ -309,21 +335,27 @@ public final class BidirectionalStreamingServerHandler<
 
   @inlinable
   internal func handleError(_ error: Error, thrownFromHandler isHandlerError: Bool = false) {
-    switch self.state {
+    switch self.lock.withLock({ self.state }) {
     case .idle:
       assert(!isHandlerError)
-      self.state = .completed
+      self.lock.withLock {
+        self.state = .completed
+      }
+
       // We don't have a promise to fail. Just send back end.
       let (status, trailers) = ServerErrorProcessor.processLibraryError(
         error,
         delegate: self.context.errorDelegate
       )
-      self.interceptors.send(.end(status, trailers), promise: nil)
+      let interceptors = self.lock.withLock { self.interceptors }
+      interceptors?.send(.end(status, trailers), promise: nil)
 
     case let .creatingObserver(context),
       let .observing(_, context):
       // We don't have a promise to fail. Just send back end.
-      self.state = .completed
+      self.lock.withLock {
+        self.state = .completed
+      }
 
       let status: GRPCStatus
       let trailers: HPACKHeaders
@@ -342,7 +374,8 @@ public final class BidirectionalStreamingServerHandler<
         )
       }
 
-      self.interceptors.send(.end(status, trailers), promise: nil)
+      let interceptors = self.lock.withLock { self.interceptors }
+      interceptors?.send(.end(status, trailers), promise: nil)
       // We're already in the 'completed' state so failing the promise will be a no-op in the
       // callback to 'userHandlerCompleted' (but we also need to avoid leaking the promise.)
       context.statusPromise.fail(error)
@@ -373,7 +406,8 @@ public final class BidirectionalStreamingServerHandler<
           delegate: self.context.errorDelegate
         )
         // Loop back via the interceptors.
-        self.interceptors.send(.end(status, trailers), promise: nil)
+        let interceptors = self.lock.withLock { self.interceptors }
+        interceptors?.send(.end(status, trailers), promise: nil)
       }
 
     case let .end(status, trailers):
