@@ -756,11 +756,6 @@ internal final class AsyncServerHandler<
   }
 }
 
-// Sendability is unchecked as all mutable state is accessed/modified from an appropriate event
-// loop.
-@available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
-extension AsyncServerHandler: @unchecked Sendable {}
-
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 extension AsyncServerHandler: AsyncServerCallContextProvider {
   @usableFromInline
