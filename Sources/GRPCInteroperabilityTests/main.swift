@@ -92,13 +92,13 @@ func makeRunnableTest(name: String) throws -> InteroperabilityTest {
 // MARK: - Command line options and "main".
 
 struct InteroperabilityTests: ParsableCommand {
-  static var configuration = CommandConfiguration(
+  static let configuration = CommandConfiguration(
     abstract: "gRPC Swift Interoperability Runner",
     subcommands: [StartServer.self, RunTest.self, ListTests.self]
   )
 
   struct StartServer: ParsableCommand {
-    static var configuration = CommandConfiguration(
+    static let configuration = CommandConfiguration(
       abstract: "Start the gRPC Swift interoperability test server."
     )
 
@@ -127,7 +127,7 @@ struct InteroperabilityTests: ParsableCommand {
   }
 
   struct RunTest: ParsableCommand {
-    static var configuration = CommandConfiguration(
+    static let configuration = CommandConfiguration(
       abstract: "Runs a gRPC interoperability test using a gRPC Swift client."
     )
 
@@ -156,7 +156,7 @@ struct InteroperabilityTests: ParsableCommand {
   }
 
   struct ListTests: ParsableCommand {
-    static var configuration = CommandConfiguration(
+    static let configuration = CommandConfiguration(
       abstract: "List all interoperability test names."
     )
 

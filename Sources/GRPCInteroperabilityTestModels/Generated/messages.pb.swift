@@ -68,7 +68,7 @@ public enum Grpc_Testing_PayloadType: SwiftProtobuf.Enum {
 
 extension Grpc_Testing_PayloadType: CaseIterable {
   // The compiler won't synthesize support with the UNRECOGNIZED case.
-  public static var allCases: [Grpc_Testing_PayloadType] = [
+  public static let allCases: [Grpc_Testing_PayloadType] = [
     .compressable,
   ]
 }

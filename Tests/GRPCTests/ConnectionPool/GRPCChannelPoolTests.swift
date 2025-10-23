@@ -343,7 +343,7 @@ final class GRPCChannelPoolTests: GRPCTestCase {
     }
 
     let lock = NIOLock()
-    var order = 0
+    nonisolated(unsafe) var order = 0
 
     // We need a connection to be up and running to avoid hitting the waiter limit when creating a
     // batch of RPCs in one go.
@@ -543,7 +543,7 @@ final class GRPCChannelPoolTests: GRPCTestCase {
   }
 
   func testDelegateCanTellWhenFirstConnectionIsBeingEstablished() {
-    final class State {
+    final class State: @unchecked Sendable {
       private enum Storage {
         case idle
         case connecting

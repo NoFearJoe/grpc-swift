@@ -27,9 +27,9 @@ struct HelloWorld: AsyncParsableCommand {
 
   func run() async throws {
     let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-    defer {
-      try! group.syncShutdownGracefully()
-    }
+//    defer {
+//      try! group.syncShutdownGracefully()
+//    }
 
     // Start the server and print its address once it has started.
     let server = try await Server.insecure(group: group)

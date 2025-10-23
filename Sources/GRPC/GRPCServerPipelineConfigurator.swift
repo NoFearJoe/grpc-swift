@@ -26,7 +26,7 @@ import NIOTLS
 /// If TLS is enabled then the handler listens for an 'TLSUserEvent.handshakeCompleted' event and
 /// configures the pipeline appropriately for the protocol negotiated via ALPN. If TLS is not
 /// configured then the HTTP version is determined by parsing the inbound byte stream.
-final class GRPCServerPipelineConfigurator: ChannelInboundHandler, RemovableChannelHandler {
+final class GRPCServerPipelineConfigurator: ChannelInboundHandler, RemovableChannelHandler, @unchecked Sendable {
   internal typealias InboundIn = ByteBuffer
   internal typealias InboundOut = ByteBuffer
 
@@ -150,7 +150,7 @@ final class GRPCServerPipelineConfigurator: ChannelInboundHandler, RemovableChan
   private func configurationCompleted(result: Result<Void, Error>, context: ChannelHandlerContext) {
     switch result {
     case .success:
-      context.pipeline.removeHandler(context: context, promise: nil)
+      context.pipeline.syncOperations.removeHandler(context: context, promise: nil)
     case let .failure(error):
       self.errorCaught(context: context, error: error)
     }

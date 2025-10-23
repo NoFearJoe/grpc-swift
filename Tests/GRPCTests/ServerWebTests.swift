@@ -28,6 +28,7 @@ import FoundationNetworking
 // Only test Unary and ServerStreaming, as ClientStreaming is not
 // supported in HTTP1.
 // TODO: Add tests for application/grpc-web as well.
+@MainActor
 class ServerWebTests: EchoTestCaseBase {
   private func gRPCEncodedEchoRequest(_ text: String) -> Data {
     var request = Echo_EchoRequest()

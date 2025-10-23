@@ -37,13 +37,13 @@ enum RPC: String, ExpressibleByArgument {
 @main
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 struct Echo: AsyncParsableCommand {
-  static var configuration = CommandConfiguration(
+  static let configuration = CommandConfiguration(
     abstract: "An example to run and call a simple gRPC service for echoing messages.",
     subcommands: [Server.self, Client.self]
   )
 
   struct Server: AsyncParsableCommand {
-    static var configuration = CommandConfiguration(
+    static let configuration = CommandConfiguration(
       abstract: "Start a gRPC server providing the Echo service."
     )
 
@@ -55,9 +55,9 @@ struct Echo: AsyncParsableCommand {
 
     func run() async throws {
       let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-      defer {
-        try! group.syncShutdownGracefully()
-      }
+//      defer {
+//        try! group.syncShutdownGracefully()
+//      }
       do {
         try await startEchoServer(group: group, port: self.port, useTLS: self.tls)
       } catch {
@@ -67,7 +67,7 @@ struct Echo: AsyncParsableCommand {
   }
 
   struct Client: AsyncParsableCommand {
-    static var configuration = CommandConfiguration(
+    static let configuration = CommandConfiguration(
       abstract: "Calls an RPC on the Echo server."
     )
 
@@ -91,9 +91,9 @@ struct Echo: AsyncParsableCommand {
 
     func run() async throws {
       let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-      defer {
-        try! group.syncShutdownGracefully()
-      }
+//      defer {
+//        try! group.syncShutdownGracefully()
+//      }
 
       let client = makeClient(
         group: group,
@@ -101,9 +101,9 @@ struct Echo: AsyncParsableCommand {
         useTLS: self.tls,
         useInterceptor: self.intercept
       )
-      defer {
-        try! client.channel.close().wait()
-      }
+//      defer {
+//        try! client.channel.close().wait()
+//      }
 
       for _ in 0 ..< self.iterations {
         await callRPC(self.rpc, using: client, message: self.message)

@@ -19,7 +19,7 @@ import NIOCore
 /// A timeout for a gRPC call.
 ///
 /// Timeouts must be positive and at most 8-digits long.
-public struct GRPCTimeout: CustomStringConvertible, Equatable {
+public struct GRPCTimeout: CustomStringConvertible, Equatable, Sendable {
   /// Creates an infinite timeout. This is a sentinel value which must __not__ be sent to a gRPC service.
   public static let infinite = GRPCTimeout(
     nanoseconds: Int64.max,

@@ -29,59 +29,60 @@ struct PCAP: AsyncParsableCommand {
   func run() async throws {
     // Create an `EventLoopGroup`.
     let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-    defer {
-      try! group.syncShutdownGracefully()
-    }
 
     // The filename for the .pcap file to write to.
     let path = "packet-capture-example.pcap"
-    let fileSink = try NIOWritePCAPHandler.SynchronizedFileSink.fileSinkWritingToFile(
-      path: path
-    ) { error in
-      print("Failed to write with error '\(error)' for path '\(path)'")
-    }
-
-    // Ensure that we close the file sink when we're done with it.
-    defer {
-      try! fileSink.syncClose()
-    }
-
-    let channel = try GRPCChannelPool.with(
-      target: .host("localhost", port: self.port),
-      transportSecurity: .plaintext,
-      eventLoopGroup: group
-    ) {
-      $0.debugChannelInitializer = { channel in
-        // Create the PCAP handler and add it to the start of the channel pipeline. If this example
-        // used TLS we would likely want to place the handler in a different position in the
-        // pipeline so that the captured packets in the trace would not be encrypted.
-        let writePCAPHandler = NIOWritePCAPHandler(mode: .client, fileSink: fileSink.write(buffer:))
-        return channel.eventLoop.makeCompletedFuture(
-          Result {
-            try channel.pipeline.syncOperations.addHandler(writePCAPHandler, position: .first)
-          }
-        )
-      }
-    }
-
-    // Create a client.
-    let echo = Echo_EchoAsyncClient(channel: channel)
-
-    let messages = ["foo", "bar", "baz", "thud", "grunt", "gorp"].map { text in
-      Echo_EchoRequest.with { $0.text = text }
-    }
 
     do {
-      for try await response in echo.update(messages) {
-        print("Received response '\(response.text)'")
+      let fileSink = try NIOWritePCAPHandler.SynchronizedFileSink.fileSinkWritingToFile(
+        path: path
+      ) { error in
+        print("Failed to write with error '\(error)' for path '\(path)'")
       }
-      print("RPC completed successfully")
-    } catch {
-      print("RPC failed with error '\(error)'")
-    }
 
-    print("Try opening '\(path)' in Wireshark or with 'tcpdump -r \(path)'")
+      do {
+        let channel = try GRPCChannelPool.with(
+          target: .host("localhost", port: self.port),
+          transportSecurity: .plaintext,
+          eventLoopGroup: group
+        ) {
+          $0.debugChannelInitializer = { channel in
+            // Create the PCAP handler and add it to the start of the channel pipeline. If this example
+            // used TLS we would likely want to place the handler in a different position in the
+            // pipeline so that the captured packets in the trace would not be encrypted.
+            let writePCAPHandler = NIOWritePCAPHandler(mode: .client, fileSink: fileSink.write(buffer:))
+            return channel.eventLoop.makeCompletedFuture(
+              Result {
+                try channel.pipeline.syncOperations.addHandler(writePCAPHandler, position: .first)
+              }
+            )
+          }
+        }
 
-    try await echo.channel.close().get()
+        // Create a client.
+        let echo = Echo_EchoAsyncClient(channel: channel)
+
+        let messages = ["foo", "bar", "baz", "thud", "grunt", "gorp"].map { text in
+          Echo_EchoRequest.with { $0.text = text }
+        }
+
+        do {
+          for try await response in echo.update(messages) {
+            print("Received response '\(response.text)'")
+          }
+          print("RPC completed successfully")
+        } catch {
+          print("RPC failed with error '\(error)'")
+        }
+
+        print("Try opening '\(path)' in Wireshark or with 'tcpdump -r \(path)'")
+
+        try await echo.channel.close().get()
+      } catch {}
+
+      try! await fileSink.close()
+    } catch {}
+
+    try! await group.shutdownGracefully()
   }
 }

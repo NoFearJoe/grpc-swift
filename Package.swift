@@ -26,14 +26,14 @@ let grpcTargetName = grpcProductName
 let cgrpcZlibTargetName = cgrpcZlibProductName
 
 let includeNIOSSL = ProcessInfo.processInfo.environment["GRPC_NO_NIO_SSL"] == nil
-let defaultSwiftSettings: [SwiftSetting] = [.swiftLanguageMode(.v5)]
+let defaultSwiftSettings: [SwiftSetting] = [.swiftLanguageMode(.v6)]
 
 // MARK: - Package Dependencies
 
 let packageDependencies: [Package.Dependency] = [
   .package(
     url: "https://github.com/apple/swift-nio.git",
-    from: "2.65.0"
+    from: "2.87.0"
   ),
   .package(
     url: "https://github.com/apple/swift-nio-http2.git",
@@ -57,7 +57,7 @@ let packageDependencies: [Package.Dependency] = [
   ),
   .package(
     url: "https://github.com/apple/swift-protobuf.git",
-    from: "1.31.0"
+    from: "1.32.0"
   ),
   .package(
     url: "https://github.com/apple/swift-log.git",

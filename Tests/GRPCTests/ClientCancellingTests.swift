@@ -18,6 +18,7 @@ import Foundation
 import GRPC
 import XCTest
 
+@MainActor
 class ClientCancellingTests: EchoTestCaseBase {
   func testUnary() {
     let statusReceived = self.expectation(description: "status received")

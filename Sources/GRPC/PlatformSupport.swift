@@ -19,8 +19,8 @@ import NIOPosix
 import NIOTransportServices
 
 /// How a network implementation should be chosen.
-public struct NetworkPreference: Hashable {
-  private enum Wrapped: Hashable {
+public struct NetworkPreference: Hashable, Sendable {
+  private enum Wrapped: Hashable, Sendable {
     case best
     case userDefined(NetworkImplementation)
   }
@@ -44,8 +44,8 @@ public struct NetworkPreference: Hashable {
 
 /// The network implementation to use: POSIX sockets or Network.framework. This also determines
 /// which variant of NIO to use; NIO or NIOTransportServices, respectively.
-public struct NetworkImplementation: Hashable {
-  fileprivate enum Wrapped: Hashable {
+public struct NetworkImplementation: Hashable, Sendable {
+  fileprivate enum Wrapped: Hashable, Sendable {
     case networkFramework
     case posix
   }

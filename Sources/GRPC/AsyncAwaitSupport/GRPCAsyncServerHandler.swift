@@ -455,11 +455,13 @@ internal final class AsyncServerHandler<
         elementType: Request.self,
         failureType: Error.self,
         backPressureStrategy: backpressureStrategy,
+        finishOnDeinit: true,
         delegate: GRPCAsyncSequenceProducerDelegate()
       )
 
       let responseWriter = NIOAsyncWriter.makeWriter(
         isWritable: true,
+        finishOnDeinit: true,
         delegate: GRPCAsyncWriterSinkDelegate<(Response, Compression)>(
           didYield: self.interceptResponseMessages,
           didTerminate: { error in
@@ -477,7 +479,7 @@ internal final class AsyncServerHandler<
       >(
         requestSource: requestSequenceProducer.source,
         responseWriterSink: responseWriter.sink,
-        task: Task {
+        task: Task { @Sendable in
           // We don't have a task cancellation handler here: we do it in `self.cancel()`.
           await self.invokeUserHandler(
             requestSequence: requestSequenceProducer,

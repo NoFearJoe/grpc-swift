@@ -361,7 +361,7 @@ class GRPCPingHandlerTests: GRPCTestCase {
 }
 
 #if compiler(>=6.0)
-extension PingHandler.Action: @retroactive Equatable {}
+extension PingHandler.Action: Equatable {}
 #else
 extension PingHandler.Action: Equatable {}
 #endif

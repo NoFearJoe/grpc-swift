@@ -42,9 +42,9 @@ struct RouteGuide: AsyncParsableCommand {
   func run() async throws {
     // Create an event loop group for the server to run on.
     let group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
-    defer {
-      try! group.syncShutdownGracefully()
-    }
+//    defer {
+//      try! group.syncShutdownGracefully()
+//    }
 
     // Read the feature database.
     let features = try loadFeatures()

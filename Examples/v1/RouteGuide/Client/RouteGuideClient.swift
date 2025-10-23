@@ -216,18 +216,18 @@ struct RouteGuide: AsyncParsableCommand {
     let features = try loadFeatures()
 
     let group = PlatformSupport.makeEventLoopGroup(loopCount: 1)
-    defer {
-      try? group.syncShutdownGracefully()
-    }
+//    defer {
+//      try? group.syncShutdownGracefully()
+//    }
 
     let channel = try GRPCChannelPool.with(
       target: .host("localhost", port: self.port),
       transportSecurity: .plaintext,
       eventLoopGroup: group
     )
-    defer {
-      try? channel.close().wait()
-    }
+//    defer {
+//      try? channel.close().wait()
+//    }
 
     let routeGuide = Routeguide_RouteGuideAsyncClient(channel: channel)
     let example = RouteGuideExample(routeGuide: routeGuide, features: features)

@@ -469,7 +469,7 @@ extension AsyncStream {
   ///
   /// - Note: This is just here to avoid duplicating the above two `perform(_:with:)` functions
   ///         for `Sequence`.
-  fileprivate init<T>(wrapping sequence: T) where T: Sequence, T.Element == Element {
+  fileprivate init<T>(wrapping sequence: T) where T: Sequence, T.Element == Element, Element: Sendable {
     self.init { continuation in
       var iterator = sequence.makeIterator()
       while let value = iterator.next() {
